@@ -16,7 +16,8 @@ export default async function handler(req, res) {
   const { name, birthdate } = req.body;
 
   const prompt = `
-You are a spiritual guide skilled in Destiny Matrix and numerology. Provide a mystical, uplifting 5-6 sentence destiny reading that is easy to display in a styled box.
+You are a spiritual guide skilled in Destiny Matrix and numerology. Provide a mystical, uplifting 5–6 sentence destiny reading. 
+Do not include decorative lines, borders, or slashes. Just plain text and emojis
 
 Name: ${name}
 Birthdate: ${birthdate}
