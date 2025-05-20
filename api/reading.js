@@ -41,6 +41,9 @@ Reading:
     const data = await response.json();
     const reading = data.choices?.[0]?.message?.content?.trim();
 
+    // 🐛 Debug log to check what OpenAI returns
+    console.log("📖 Your Destiny Reading is:", reading);
+
     res.setHeader('Access-Control-Allow-Origin', 'https://hawk-red-pwpn.squarespace.com');
     res.status(200).json({ reading });
   } catch (err) {
