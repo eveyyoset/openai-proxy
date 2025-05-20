@@ -25,29 +25,33 @@ Reading:
 `;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 250,
-      }),
-    });
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 250,
+    }),
+  });
 
-    const data = await response.json();
-    const reading = data.choices?.[0]?.message?.content?.trim();
+  const data = await response.json();
 
-    // 🐛 Debug log to check what OpenAI returns
-    console.log("📖 Your Destiny Reading is:", reading);
+  if (!response.ok) {
+    console.error("❌ OpenAI API Error:", data);
+    return res.status(500).json({ error: "OpenAI error", detail: data });
+  }
 
-    res.setHeader('Access-Control-Allow-Origin', 'https://hawk-red-pwpn.squarespace.com');
-    res.status(200).json({ reading });
-  } catch (err) {
-    console.error("Error fetching from OpenAI:", err);
-    res.status(500).json({ error: "Failed to generate reading" });
+  const reading = data.choices?.[0]?.message?.content?.trim();
+  console.log("📖 Your Destiny Reading is:", reading);
+
+  res.setHeader('Access-Control-Allow-Origin', 'https://hawk-red-pwpn.squarespace.com');
+  res.status(200).json({ reading });
+} catch (err) {
+  console.error("⚠️ Server error:", err);
+  res.status(500).json({ error: "Server error", detail: err.message });
   }
 }
