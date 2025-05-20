@@ -1,4 +1,14 @@
 export default async function handler(req, res) {
+  // Handle preflight request (for CORS)
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*'); // <-- Allow all origins (or replace * with your Squarespace URL)
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(200).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).send('Method Not Allowed');
   }
@@ -30,6 +40,8 @@ Reading:
 
     const data = await response.json();
     const reading = data.choices?.[0]?.message?.content?.trim();
+
+    res.setHeader('Access-Control-Allow-Origin', 'https://hawk-red-pwpn.squarespace.com');
     res.status(200).json({ reading });
   } catch (err) {
     console.error("Error fetching from OpenAI:", err);
