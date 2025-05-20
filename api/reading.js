@@ -2,13 +2,13 @@ export default async function handler(req, res) {
   // Handle preflight CORS requests
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', 'https://hawk-red-pwpn.squarespace.com'); // Replace with your actual Squarespace URL
+    res.setHeader('Access-Control-Allow-Origin', 'https://hawk-red-pwpn.squarespace.com'); // Your Squarespace domain
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     return res.status(200).end();
   }
 
-  // Reject any method that isn't POST
+  // Reject anything that's not POST
   if (req.method !== 'POST') {
     return res.status(405).send('Method Not Allowed');
   }
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   const { name, birthdate } = req.body;
 
   const prompt = `
-You are a spiritual guide skilled in Destiny Matrix and numerology. Provide a mystical, uplifting 5-6 sentence destiny reading for:
+You are a spiritual guide skilled in Destiny Matrix and numerology. Provide a mystical, uplifting 5-6 sentence destiny reading that is easy to display in a styled box.
 
 Name: ${name}
 Birthdate: ${birthdate}
@@ -34,7 +34,8 @@ Reading:
       body: JSON.stringify({
         model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 250,
+        max_tokens: 180, // Shorter reading
+        temperature: 0.9, // A little more variation/spirituality
       }),
     });
 
@@ -45,7 +46,11 @@ Reading:
       return res.status(500).json({ error: "OpenAI error", detail: data });
     }
 
-    const reading = data.choices?.[0]?.message?.content?.trim();
+    let reading = data.choices?.[0]?.message?.content?.trim() || "";
+
+    // Optional cleanup of line breaks
+    reading = reading.replace(/\n{2,}/g, '\n').replace(/\n/g, ' ');
+
     console.log("📖 Your Destiny Reading is:", reading);
 
     res.setHeader('Access-Control-Allow-Origin', 'https://hawk-red-pwpn.squarespace.com');
